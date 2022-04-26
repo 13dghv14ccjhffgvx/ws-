@@ -1,0 +1,12 @@
+
+C
+java:S1948"&Make "conn" transient or serializable.(·ššÔ8Æÿù‹ƒ0
+A
+java:S1948"$Make "ps" transient or serializable.(¼ßŞÉ8Éÿù‹ƒ0
+F
+java:S1948"$Make "rs" transient or serializable.(‰Úèüÿÿÿÿ8Ëÿù‹ƒ0
+H
+java:S1068"&Remove this unused "rs" private field.(‰Úèüÿÿÿÿ8€ú‹ƒ0
+J
+java:S16041"(Make this anonymous inner class a lambda(¹×û¬ıÿÿÿÿ8‘€ú‹ƒ0
+{	java:S120"ZRename this package name to match the regular expression '^[a-z_]+(\.[a-z_][a-z0-9_]*)*$'.(¸’¤üÿÿÿÿ8”€ú‹ƒ0

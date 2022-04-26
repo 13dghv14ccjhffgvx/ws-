@@ -1,0 +1,28 @@
+
+E
+java:S3740^"/Provide the parametrized type for this generic.(ÌÙ´†
+J
+java:S3740e"/Provide the parametrized type for this generic.(éì£¸şÿÿÿÿ
+l
+java:S1450"QRemove the "rs" field and declare it as a local variable in the relevant methods.(‰Úèüÿÿÿÿ
+A
+java:S1948"&Make "conn" transient or serializable.(´¤´‚ıÿÿÿÿ
+:
+java:S1948"$Make "ps" transient or serializable.(œíÂÊ
+?
+java:S1948"$Make "rs" transient or serializable.(‰Úèüÿÿÿÿ
+W
+java:S3252%"AUse static access with "javax.swing.SwingConstants" for "CENTER".(÷ùï­
+c
+java:S3252’"LUse static access with "javax.swing.WindowConstants" for "DISPOSE_ON_CLOSE".(Òœ Ğ
+>
+java:S16040"(Make this anonymous inner class a lambda(ó º‘
+C
+java:S16047"(Make this anonymous inner class a lambda(¶ üÚÿÿÿÿÿ
+=
+java:S1604="(Make this anonymous inner class a lambda(¬öº
+C
+java:S1604C"(Make this anonymous inner class a lambda(¹×û¬ıÿÿÿÿ
+>
+java:S1604I"(Make this anonymous inner class a lambda(™¬ŞÔ
+o	java:S120"ZRename this package name to match the regular expression '^[a-z_]+(\.[a-z_][a-z0-9_]*)*$'.(ÀÍö¨
