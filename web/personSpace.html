@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-3.6.0.js"></script>
+</head>
+<body>
+<div id="userid" hidden="hidden"></div>
+<div align="center" style="margin-bottom: 50px">
+    用户名<span id="username"></span>
+    <img id="headimg" src="" width="100px" height="100px" style="vertical-align: middle"><br>
+    <br><br>
+    昵称<span id="nickname"></span>
+    <br><br>
+    获赞<span id="likenum"> </span>
+    <span id="blog">文章</span>
+    <span id="concerns">关注</span>
+    <span id="fans">粉丝</span>
+    <span id="collect">收藏夹</span>
+    <a href="contentManage.html"></a>
+    <div id="show" align="center">
+    </div>
+</div>
+
+</body>
+<script>
+    var userId;
+    //个人信息
+    $.ajax({
+        url: "user/getUserMessage",
+        type: "POST",
+        data: {},
+        success: function (res) {
+            userId = res.user.userId
+            $("#userid").html(res.user.userId)
+            $("#username").html(res.user.userName)
+            $("#nickname").html(res.user.nickName)
+            $("#headimg").attr("src", res.user.headImg)
+            $("#likenum").html(res.likeNum)
+        },
+        dataType: "json"
+    })
+
+    //我的关注
+    $("#concerns").click(function () {
+        $.ajax({
+            url: "user/getConcerns",
+            type: "POST",
+            data: {userId: userId},
+            success: function (res) {
+                $("#show").html("")
+                $("#show").append("<tr>" + "<td>昵称</td>" + "</tr>")
+                for (var i = 0; i < res.length; i++) {
+                    $("#show").append(" <tr><td>" + '<a target=_blank href=otherSpace.html?userId=' + res[i].userId + '>' + res[i].nickName + '</a></td>' + '</tr>' + '<br><br>')
+                }
+            },
+            dataType: "json"
+        });
+    })
+
+    //我的粉丝
+    $("#fans").click(function () {
+        $.ajax({
+            url: "user/getFans",
+            type: "POST",
+            data: {userId: userId},
+            success: function (res) {
+                var fan = "<tr>" + "<td>昵称</td>" + "</tr>"
+                for (var i = 0; i < res.length; i++) {
+
+                    fan += "<tr><td>" + '<a target=_blank href=otherSpace.html?userId=' + res[i].userId + '>' + res[i].nickName + '</a></td>' + '</tr>'
+                }
+                $("#show").html(fan)
+            },
+            dataType: "json"
+        });
+    })
+
+    //我的文章
+    $("#blog").click(function () {
+        $.ajax({
+            url: "user/getMyBlog",
+            type: "POST",
+            data: {userId: userId},
+            success: function (res) {
+                $("#show").html("")
+                for (var i = 0; i < res.length; i++) {
+                    $("#show").append('<a target=_blank href=blog.html?blogId=' + res[i].blogId + '>' + res[i].title + '</a>' + '<br/>');
+                }
+            }
+        })
+    })
+
+    //我的收藏
+    $("#collect").click(function () {
+        $.ajax({
+            url: "collect/getMyCollects",
+            type: "POST",
+            data: {},
+            success: function (res) {
+                $("#show").html("")
+                for (var i = 0; i < res.length; i++) {
+                    $("#show").append('<a target=_blank href=blog.html?blogId=' + res[i].blogId + '>' + res[i].title + '</a>');
+
+                }
+            }
+        })
+    })
+
+
+</script>
+</html>

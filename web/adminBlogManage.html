@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="css/index.css">
+    <script type="text/javascript" src="http://code.jquery.com/jquery-3.6.0.js"></script>
+</head>
+<body>
+<header>
+
+    <div class="header-middle">
+        <div style="width: 1000px">
+            <a href="index.html">CSDN</a>
+            <a href="adminBlogManage.html">文章管理</a>
+            <a href="adminUserManage.html">评论管理</a>
+            <a href="adminReport.html">举报管理</a>
+            <a href="adminBan.html">用户封禁管理</a>
+        </div>
+        <input type="text" placeholder="" id="searchinfo">
+        <button id="search"><a href="blog.html" id="searchto" target=_blank>搜索</a></button>
+    </div>
+</header>
+<article>
+    <section>
+        <div class="section-top"></div>
+        <div class="nav">
+            <ul>
+                <li><span class="type" id="1">后端</span></li>
+                <li><span class="type">前端</span></li>
+                <li><span>移动开发</span></li>
+                <li><a href="#">编程语言</a></li>
+                <li><a href="#">Java</a></li>
+                <li><a href="#">Python</a></li>
+                <li><a class="type">人工智能</a></li>
+                <li><a href="#">大数据</a></li>
+                <li><a href="#">数据结构与算法</a></li>
+                <li><a href="#">音视频</a></li>
+                <li><a href="#">云原生</a></li>
+                <li><a href="#">云平台</a></li>
+                <li><a href="#">运维</a></li>
+                <li><a href="#">服务器</a></li>
+                <li><a href="#">操作系统</a></li>
+                <li><a href="#">数据库管理</a></li>
+            </ul>
+        </div>
+        <span id="delete">批量删除</span>
+        <div id="show" STYLE="text-align: center"></div>
+        <div style="text-align: center;position: absolute;left: 38.5%;bottom: 15%">
+            <tr height="50" style="background-color: #7f4ffe">
+                <td colspan="9" align="center" style="margin: 0 auto;text-align: center">
+                    <span id="first">首页</span>
+                    <span id="pre">上一页</span>
+                    当前第<span id="pageNum">1</span>页/共<span id="pagecount"></span>页
+                    <span id="next">下一页</span>
+                    <span id="last">尾页</span>
+                </td>
+            </tr>
+        </div>
+        <div class="section-middle"></div>
+    </section>
+</article>
+</body>
+<script>
+    var num = 1;
+    var current = "后端";
+
+    function req() {
+        $.ajax({
+            url: "blog/listBlog",
+            type: "POST",
+            data: {type: current, pageNum: num},
+            success: function (res) {
+                $("#show").html("");
+                for (var i = 0; i < res.blogs.list.length; i++) {
+                    $("#show").append('<input type="checkbox" name="subcheck" value='+res.blogs.list[i].blogId+'>'+'<a STYLE=" display:inline-block;margin-top: 10px" target=_blank href=blog.html?blogId=' + res.blogs.list[i].blogId + '>' + res.blogs.list[i].title + '</a>');
+                    $("#show").append('<span class="deleteblog" id=' + res.blogs.list[i].blogId + '>' + '删除' + '</span>' + "<br>");
+                }
+                $("#pageNum").html(num);
+                $("#pagecount").html(res.blogs.pageCount)
+                $(".deleteblog").click(function () {
+                    $.ajax({
+                        url: "admin/adminDeleteBlog",
+                        type: "POST",
+                        data: {blogId: $(this).attr("id")},
+                        complete: function (res) {
+                            alert("删除成功")
+                            req()
+                        }
+                    })
+                })
+                $("#pageNum").html(num);
+            },
+            dataType: "json"
+        });
+    }
+
+    req()
+
+
+    $(".type").click(function () {
+        num=1
+        current = $(this).html()
+        req()
+    })
+
+    $("#next").click(function () {
+        if (num < $("#pagecount").html()) {
+            num++;
+            req();
+        }
+    })
+    $("#pre").click(function () {
+        if (num > 1) {
+            num--;
+            req();
+        }
+    })
+    $("#first").click(function () {
+        num = 1;
+        req();
+    })
+    $("#last").click(function () {
+        num = $("#pagecount").html();
+        req();
+    })
+    $('#search').click(function () {
+        $("#searchto").attr("href", "adminSearch.html?blogtitle=" + $("#searchinfo").val())
+    })
+
+    $("#delete").click(function (){
+        var checkedList = new Array();
+        var checkedNum = $("input[name='subcheck']:checked").length
+        if (checkedNum==0){
+            alert("请先选择删除的文章")
+            return ;
+        }
+        $("input[name='subcheck']:checked").each(function (){
+            checkedList.push($(this).val())
+        })
+        $.ajax({
+            url: "admin/deleteBlogs",
+            type: "POST",
+            data: {blogIds: checkedList.toString()},
+            success: function (res) {
+                alert("删除成功")
+               location.reload()
+            }
+        })
+    })
+
+</script>
+</html>

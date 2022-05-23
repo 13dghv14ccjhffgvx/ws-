@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="css/index.css">
+    <script type="text/javascript" src="http://code.jquery.com/jquery-3.6.0.js"></script>
+</head>
+<body>
+<header>
+    <div class="header-left">`
+        <a href="#"></a>
+        <ul>
+            <li><a href="#">博客</a></li>
+            <li><a href="#">课程</a></li>
+            <li><a href="#">文库·商城</a></li>
+            <li><a href="#">问答</a></li>
+            <li><a href="#">社区</a></li>
+            <li><a href="#">插件</a></li>
+            <li><a href="admin.html" hidden="hidden" id="admin">管理员界面</a></li>
+        </ul>
+    </div>
+    <div class="header-middle">
+        <input type="text" placeholder="深度优先算法" id="searchinfo">
+        <button id="search"><a href="blog.html" id="searchto" target=_blank>搜索</a></button>
+    </div>
+    <ul class="header-right">
+        <li><a href="login.html" id="login">登录/注册</a></li>
+        <li class="gift"><a href="userinfo.html">个人信息</a></li>
+        <li class="gift"><a href="personSpace.html">个人主页</a></li>
+        <li class="gift"><a href="contentManage.html" id="contentmange">内容管理</a></li>
+        <li class="footprint"><a href="at.html" id="message" hidden="hidden">消息</a></li>
+        <li class="creatMoney"><a href="addblog.html"><span>创作</span></a></li>
+    </ul>
+</header>
+<!-- 中间内容部分的制作 -->
+<article>
+    <section>
+        <div class="section-top"></div>
+        <div class="nav">
+            <ul>
+                <li><a href="back-end.html">后端</a></li>
+                <li><a href="web.html">前端</a></li>
+                <li><a href="#">移动开发</a></li>
+                <li><a href="#">编程语言</a></li>
+                <li><a href="#">Java</a></li>
+                <li><a href="#">Python</a></li>
+                <li><a href="ai.html">人工智能</a></li>
+                <li><a href="#">大数据</a></li>
+                <li><a href="#">数据结构与算法</a></li>
+                <li><a href="#">音视频</a></li>
+                <li><a href="#">云原生</a></li>
+                <li><a href="#">云平台</a></li>
+                <li><a href="#">运维</a></li>
+                <li><a href="#">服务器</a></li>
+                <li><a href="#">操作系统</a></li>
+                <li><a href="#">数据库管理</a></li>
+            </ul>
+        </div>
+        <!--        <div id="title">312313</div>-->
+        <!--        <span id="blogid">123</span><br>-->
+        <!--        <span id="content">6666</span><br>-->
+        <div id="table" STYLE="text-align: center">
+        </div>
+        <div style="text-align: center;position: absolute;left: 38.5%;bottom: 15%">
+            <tr height="50" style="background-color: #7f4ffe">
+                <td colspan="9" align="center" style="margin: 0 auto;text-align: center">
+                    <span id="first">首页</span>
+                    <span id="pre">上一页</span>
+                    当前第<span id="pageNum">1</span>页/共<span id="pagecount"></span>页
+                    <span id="next">下一页</span>
+                    <span id="last">尾页</span>
+                </td>
+            </tr>
+        </div>
+
+        <div class="section-middle"></div>
+    </section>
+</article>
+<span id="likeBlogList" style="width: 300px;display: inline-block;margin-left: 350px">点赞榜</span><span id="collectBlogList" style="width: 300px;display: inline-block;margin-left: 550px">收藏榜</span>
+</body>
+<script>
+    var num = 1;
+    var current = "人工智能";
+
+    //获取 未读的at消息
+    function at() {
+        $.ajax({
+            url: "at/getUnreadAt",
+            type: "POST",
+            data: {},
+            success: function (res) {
+                if (res !="") {
+                    $("#message").css("color", "red")
+                }
+            },
+            dataType: "json"
+        });
+    }
+    window.setInterval("at()", 1000)
+    //点击消息,是消息变为已读状态
+    $("#message").click(function () {
+        $.ajax({
+            url: "at/readAt",
+            type: "POST",
+            data: {},
+            complete: function () {
+                $("#message").css("color", "black")
+            },
+            dataType: "json"
+        });
+    })
+
+    //获取当前页的内容
+    function req() {
+        $.ajax({
+            url: "blog/listBlog",
+            type: "POST",
+            data: {type: current, pageNum: num},
+            success: function (res) {
+                var list = "";
+                if (res.user != null) {
+                    $("#message").show()
+                    at()
+                }
+                for (var i = 0; i < res.blogs.list.length; i++) {
+                    list += '<a STYLE=" display:inline-block;margin-top: 10px" target=_blank href=blog.html?blogId=' + res.blogs.list[i].blogId + '>' + res.blogs.list[i].title + '</a>' + "<br>";
+                }
+                $("#pageNum").html(num);
+                $("#table").html(list);
+            },
+            dataType: "json"
+        });
+    }
+
+    //发送请求,获取当前分类想的文章信息
+    $.ajax({
+        url: "blog/listBlog",
+        type: "POST",
+        data: {type: current, pageNum: $("#pageNum").html()},
+        success: function (res) {
+            if (res.user != null) {
+                $("#message").show()
+                at()
+                $("#login").html("退出")
+                $("#login").attr("href", "logout.html")
+                if (res.user.roleId == 2) {
+                    $("#admin").show()
+                }
+            }
+            var list = "";
+            for (var i = 0; i < res.blogs.list.length; i++) {
+                list += '<a STYLE=" display:inline-block;margin-top: 10px" target=_blank href=blog.html?blogId=' + res.blogs.list[i].blogId + '>' + res.blogs.list[i].title + '</a>' + "<br>";
+            }
+            $("#pageNum").html(num);
+            $("#pagecount").html(res.blogs.pageCount)
+            for (var j=0;j<res.likeBlogList.length;j++){
+                $('#likeBlogList').append('<div><a href=blog.html?blogId='+res.likeBlogList[j].blogId+'>'+res.likeBlogList[j].title+'</a></div>')
+            }
+            for (var k=0;k<res.collectBlogList.length;k++){
+                $('#collectBlogList').append('<div><a href=blog.html?blogId='+res.collectBlogList[k].blogId+'>'+res.collectBlogList[k].title+'</a></div>')
+            }
+            $("#table").html(list);
+        },
+        dataType: "json"
+    });
+
+    //下一页
+    $("#next").click(function () {
+        if (num < $("#pagecount").html()) {
+            num++;
+            req();
+        }
+    })
+
+    //上一页
+    $("#pre").click(function () {
+        if (num > 1) {
+            num--;
+            req();
+        }
+    })
+
+    //首页
+    $("#first").click(function () {
+        num = 1;
+        req();
+    })
+
+    //尾页
+    $("#last").click(function () {
+        num = $("#pagecount").html();
+        req();
+    })
+
+    //搜索
+    $('#search').click(function () {
+        if ($("#searchinfo").val() == "") {
+            alert("搜索内容不能为空")
+            return;
+        }
+        $("#searchto").attr("href", "search.html?blog_title=" + $("#searchinfo").val())
+    })
+
+
+    $("#contentmanage").click(function () {
+        $("#contentmanage").attr("href", "contentManage.html?userId=" + userId)
+    })
+</script>
+</html>

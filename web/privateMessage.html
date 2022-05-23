@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-3.6.0.js"></script>
+</head>
+<body>
+<div style="position: absolute;left: 0;top: 0">
+    <table id="talkingUser">
+        <tr>
+            <td>
+                聊天对象
+            </td>
+        </tr>
+    </table>
+</div>
+<div style="position: absolute;left: 35%">
+    <span id="talk" style="display: inline-block;width: 400px"></span>
+    <br><br><br>
+    <textarea id="message" cols="40" rows="5"></textarea>
+    图片<input type="file" id="img">
+    <input type="button" value="发送" id="send">
+</div>
+
+</body>
+<script>
+    var user;
+    var talker;
+    var talkerId;
+    var userId;
+    var userName;
+    var lenth;
+    //获取聊天对象
+    $.ajax({
+        url: "privateMessage/getTalkingUser",
+        type: "POST",
+        data: {},
+        success: function (res) {
+
+            user = res.user
+            for (var i = 0; i < res.talkers.length; i++) {
+                $("#talkingUser").append('<tr><td class="talk" id=' + res.talkers[i].userId + '>' + res.talkers[i].nickName + '</td></tr>')
+                for (var j = 0; j < res.unReadMessage.length; j++) {
+                    if (res.unReadMessage[j].senderId == res.talkers[i].userId) {
+                        var id = '#' + res.talkers[i].userId;
+                        $(id).css("color", "red")
+                    }
+                }
+                $(".talk").click(function () {
+                    talkerId = $(this).attr("id")
+                    var id = '#' + talkerId;
+                    $(id).css("color", "black")
+                    $.ajax({
+                        url: "privateMessage/modifyStatus",
+                        type: "POST",
+                        data: {talkerId: talkerId},
+                        complete: function () {
+                            getMessage()
+                        },
+                        dataType: "json"
+                    })
+                })
+                lenth = 0
+                talkerId = res.talkers[0].userId
+                userId = res.user.userId
+                userName = res.user.userName
+                getMessage()
+            }
+        },
+        dataType: "json"
+    });
+
+    //发送消息
+    $("#send").click(function () {
+        var file = $("#img")[0].files[0];
+        var formData = new FormData();
+        formData.append("img", file)
+        formData.append("message", encodeURI($("#message").val()))
+        formData.append("talkerId", talkerId)
+        $.ajax({
+            url: "privateMessage/sendMessage",
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            complete: function () {
+                getNewMessage()
+            },
+            dataType: "json"
+        })
+    })
+
+    //获取消息
+    function getMessage() {
+        $.ajax({
+            url: "privateMessage/getMessage",
+            type: "POST",
+            data: {senderId: userId, talkerId: talkerId},
+            success: function (res) {
+                talker = res.talker
+                $("#talk").html("")
+                var privateMessage;
+                for (var i = 0; i < res.message.length; i++) {
+                    if (userId != res.message[i].senderId) {
+                        privateMessage = '<div style="text-align: left" ><div>' + time(res.message[i].messageTime) + '</div><img  class="head" width="50px" height="50px" src=' + res.talker.headImg + '><span>' + talker.nickName + '</span></div>' + '<div style="text-align: right" >' + res.message[i].message + '</div>'
+                        if (res.message[i].imgPath != "") {
+                            privateMessage += '<p style="text-align: left"> <img width="60px" height="70px" src=' + res.message[i].imgPath + '></p>'
+                        }
+                    } else {
+                        privateMessage = '<div style="text-align: right">' + time(res.message[i].messageTime) + '</div><div style="position:relative;left: 300px"><img class="head" width="50px" height="50px" src=' + res.talker.headImg + '><span>' + '我' + '</span></div>' + '<div style="text-align: left" >' + res.message[i].message + '</div>' + '<div style="text-align: left" class="withdrawn" id=' + res.message[i].privateMessageId + '>' + '撤回' + '</div>'
+
+
+                        if (res.message[i].imgPath != "") {
+                            privateMessage += '<p style="text-align: right"> <img width="60px" height="70px" src=' + res.message[i].imgPath + '></p>'
+                        }
+                    }
+                    $("#talk").append(privateMessage)
+                }
+                $(".head").css("border-radius", "50%")
+                lenth = res.message.length
+                $(".withdrawn").click(function () {
+                    $.ajax({
+                        url: "privateMessage/deleteMessage",
+                        type: "POST",
+                        data: {messageId: $(this).attr("id")},
+                        success: function (res) {
+                            if (res == 1) {
+                                alert("撤回成功")
+                            } else {
+                                alert("发布时间超过两分钟,无法撤回")
+                            }
+                            getMessage()
+                        },
+                        dataType: "json"
+                    })
+
+                })
+            },
+            dataType: "json"
+        });
+    }
+
+    //获取新消息
+    function getNewMessage() {
+        $.ajax({
+            url: "privateMessage/getMessage",
+            type: "POST",
+            data: {senderId: userId, talkerId: talkerId},
+            success: function (res) {
+                for (var i = 0; i < res.talkers.length; i++) {
+                    for (var j = 0; j < res.unReadMessage.length; j++) {
+                        if (res.unReadMessage[j].senderId == res.talkers[i].userId) {
+                            var id = '#' + res.talkers[i].userId;
+                            $(id).css("color", "red")
+                        }
+                    }
+                }
+                var privateMessage;
+                if (res.message.length === lenth) {
+                    return
+                }
+                if (res.message.length < lenth) {
+                    $("#talk").html("")
+                    getMessage()
+                    return
+                }
+                for (var i = lenth; i < res.message.length; i++) {
+                    if (userId != res.message[i].senderId) {
+                        privateMessage = '<p style="text-align: left" ><div>' + time(res.message[i].messageTime) + '</div><img class="head" width="50px" height="50px" src=' + res.talker.headImg + '><span>' + talker.nickName + '</span></p>' + '<div style="text-align: right" >' + res.message[i].message + '</div>'
+                        if (res.message[i - 1].imgPath != "") {
+                            privateMessage += '<p style="text-align: left"> <img width="60px" height="70px" src=' + res.message[i].imgPath + '></p>'
+                        }
+                    } else {
+                        privateMessage = '<div style="text-align: right">' + time(res.message[i].messageTime) + '</div><div style="position:relative;left: 300px"><img class="head" width="50px" height="50px" src=' + res.talker.headImg + '><span>' + '我' + '</span></div>' + '<div style="text-align: left" >' + res.message[i].message + '</div>' + '<div style="text-align: left" class="withdrawn" id=' + res.message[i].privateMessageId + '>' + '撤回' + '</div>'
+                        if (res.message[i].imgPath != "") {
+                            privateMessage += '<p style="text-align: right"> <img width="60px" height="70px" src=' + res.message[i].imgPath + '></p>'
+                        }
+                    }
+                    $("#talk").append(privateMessage)
+                    $(".head").css("border-radius", "50%")
+                }
+                lenth = res.message.length
+                $(".withdrawn").click(function () {
+                    $.ajax({
+                        url: "privateMessage/deleteMessage",
+                        type: "POST",
+                        data: {messageId: $(this).attr("id")},
+                        success: function (res) {
+                            if (res == 1) {
+                                alert("撤回成功")
+                            } else {
+                                alert("发布时间超过两分钟,无法撤回")
+                            }
+                            getMessage()
+                        },
+                        dataType: "json"
+                    })
+
+                })
+            },
+            dataType: "json"
+        });
+    }
+
+    /**
+     * 规范时间格式
+     * @param data
+     * @returns {string}
+     */
+    function time(data) {
+        var date = new Date(data)
+        var Y = date.getFullYear() + '-'
+        var M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-'
+        var D = (date.getDate() < 10 ? '0' + date.getDate() : date.getDate()) + ' '
+        var h = (date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':'
+        var m = (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()) + ':'
+        var s = (date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds())
+        return Y + M + D + h + m + s
+    }
+
+    window.setInterval("getNewMessage()", 1000)
+</script>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-3.6.0.js"></script>
+</head>
+<body>
+<a href="index.html">CSDN</a>
+<a href="adminBlogManage.html">文章管理</a>
+<a href="adminUserManage.html">评论管理</a>
+<a href="adminReport.html">举报管理</a>
+<a href="adminBan.html">用户封禁管理</a>
+<br><br>
+<div align="center">
+    <div id="reportBlog">举报文章</div>
+    <span id="complete">已审核</span>&nbsp&nbsp&nbsp&nbsp
+    <span id="incomplete">未审核</span>
+    <div id="show"></div>
+</div>
+
+
+</body>
+<script>
+    reportBlog()
+
+    //获取举报的文章
+    function reportBlog() {
+        $.ajax({
+            url: "report/getReports",
+            type: "POST",
+            data: {},
+            success: function (res) {
+                $("#show").html("")
+                for (var i = 0; i < res.reports.length; i++) {
+                    $("#show").append('<span style="display: inline-block;width: 100px;margin-right: 30px">' + res.users[i].userName + '</span>')
+                    $("#show").append('<span><a target=_blank href=blog.html?blogId=' + res.blogs[i].blogId + '>' + res.blogs[i].title + '</a>' +
+                        '&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp' + '<a target=_blank href=adminReportContent.html?reportId=' + res.reports[i].reportId + '>' + '评论内容' + '</a>' +
+                        '</span>' + '<br><br>')
+                }
+            },
+            dataType: "json",
+        });
+    }
+
+    $("#reportBlog").click(function (){
+            reportBlog()
+    })
+
+    //获取已审核的举报文章
+    $("#complete").click(function () {
+        $.ajax({
+            url: "report/getCompleteReports",
+            type: "POST",
+            data: {},
+            success: function (res) {
+                $("#show").html("")
+                for (var i = 0; i < res.reports.length; i++) {
+                    $("#show").append('<span>' + res.users[i].userName + '</span>')
+                    $("#show").append('<a target=_blank href=blog.html?blogId=' + res.blogs[i].blogId + '>' + res.blogs[i].title + '</a>' +
+                        '<a target=_blank href=adminReportContent.html?reportId=' + res.reports[i].reportId + '>' + '评论内容' + '</a>' +
+                       '<br><br>')
+                }
+            },
+            dataType: "json",
+        });
+    })
+
+    //未审核的举报文章
+    $("#incomplete").click(function () {
+        $.ajax({
+            url: "report/getIncompleteReports",
+            type: "POST",
+            data: {},
+            success: function (res) {
+                $("#show").html("")
+                for (var i = 0; i < res.reports.length; i++) {
+                    $("#show").append('<span>' + res.users[i].userName + '</span>')
+                    $("#show").append('<span><a target=_blank href=blog.html?blogId=' + res.blogs[i].blogId + '>' + res.blogs[i].title + '</a>' +
+                        '<a target=_blank href=adminReportContent.html?reportId=' + res.reports[i].reportId + '>' + '评论内容' + '</a>' +
+                        '</span>' + '<br><br>')
+                }
+            },
+            dataType: "json",
+        });
+    })
+</script>
+</html>

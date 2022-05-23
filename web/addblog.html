@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-3.6.0.js"></script>
+    <style>
+        #title {
+            width: 400px;
+            height: 30px;
+        }
+
+
+    </style>
+</head>
+<body>
+
+<div align="center">
+    <input type="text" placeholder="请输入标题" id="title">
+
+
+    <div>
+        <textarea name="description" style="resize:none" cols="80" rows="50" placeholder="请输入内容"
+                  id="content"></textarea>
+    </div>
+    <div>
+        <input type="file" id="img" value="图片">
+    </div>
+    <br>
+    请选择文章类型:
+    <select id="type">
+        <option value="人工智能">
+            人工智能
+        </option>
+        <option value="前端">
+            前端
+        </option>
+        <option value="后端">
+            后端
+        </option>
+        <option value="架构">
+            架构
+        </option>
+        <option value="区块链">
+            区块链
+        </option>
+        <option value="数据库">
+            数据库
+        </option>
+        <option value="5G">
+            5G
+        </option>
+        <option value="游戏开发">
+            游戏开发
+        </option>
+        <option value="大数据">
+            大数据
+        </option>
+    </select>
+    <input type="button" value="发布" id="write">
+    <input type="button" value="保存草稿" id="save">
+</div>
+</body>
+<script>
+    var userId;
+
+    //草稿
+    $.ajax({
+        url: "blog/getDraft",
+        type: "POST",
+        data: {},
+        success: function (res) {
+            userId = res.user.userId;
+            $("#title").attr("value", res.draft.title)
+            $("#content").html(res.draft.content);
+            $("#type").val(res.draft.type)
+
+        },
+        dataType: "json"
+    })
+
+    //发布文章
+    $("#write").click(function () {
+        $.ajax({
+            url: "admin/getBanUser",
+            type: "POST",
+            data: {userId: userId},
+            success: function (res) {
+                if (res == 1) {
+                    alert("你已被封禁,无法进行相关操作")
+                    return
+                }
+                if ($("#title").val() == "") {
+                    alert("标题不能为空")
+                    return;
+                }
+                if ($("#content").val() == "") {
+                    alert("文章内容不能为空")
+                    return;
+                } else {
+                    var file = $("#img")[0].files[0];
+                    var formData = new FormData();
+                    formData.append("img", file)
+                    formData.append("content", encodeURI($("#content").val()))
+                    formData.append("type", encodeURI($("#type").find("option:selected").val()))
+                    formData.append("title", encodeURI($("#title").val()))
+                    $.ajax({
+                        url: "blog/write",
+                        type: "POST",
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        async: false,
+                        complete: function () {
+                            location.href = "index.html";
+                        },
+                    })
+                }
+            },
+            dataType: "json"
+        })
+    })
+
+    //保存草稿
+    $("#save").click(function () {
+        if ($("#content").val() == "") {
+            alert("文章内容不能为空")
+            return;
+        }
+        var formData = new FormData();
+        formData.append("content", encodeURI($("#content").val()))
+        formData.append("title", encodeURI($("#title").val()))
+        formData.append("type", encodeURI($("#type").val()))
+        $.ajax({
+            url: "blog/save",
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            complete: function () {
+                location.href = "index.html";
+            },
+        })
+    })
+</script>
+</html>

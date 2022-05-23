@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-3.6.0.js"></script>
+    <link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+<a href="index.html">CSDN</a>
+<a href="adminBlogManage.html">文章管理</a>
+<a href="adminUserManage.html">评论管理</a>
+<a href="adminReport.html">举报管理</a>
+<a href="adminBan.html">用户封禁管理</a>
+
+<div class="header-middle">
+    <input type="text" placeholder="" id="searchinfo">
+    <button id="search">搜索</button>
+</div>
+<div align="center">
+    <br>
+    <span id="ban" style="cursor: pointer">封禁用户</span>&nbsp&nbsp&nbsp
+    <span id="normal" style="cursor: pointer">正常用户</span>
+    <br>
+    <table id="users"></table>
+    <select id="type" hidden="hidden">
+        <option value="1">
+            1天
+        </option>
+        <option value="2">
+            2天
+        </option>
+        <option value="3">
+            3天
+        </option>
+        <option value="4">
+            4天
+        </option>
+        <option value="5">
+            5天
+        </option>
+        <option value="6">
+            6天
+        </option>
+        <option value="7">
+            7天
+        </option>
+    </select>
+</div>
+
+
+</body>
+<script>
+    //搜索用户
+    $("#search").click(function () {
+        $.ajax({
+            url: "admin/adminSearchUsers",
+            type: "POST",
+            data: {nickName: $("#searchinfo").val()},
+            success: function (res) {
+                $("#users").html("")
+                $("#type").show()
+                for (var i = 0; i < res.users.length; i++) {
+                    $("#users").append('<span style="display: inline-block;width: 100px" id="user">' + res.users[i].nickName + '</span>');
+                    if (res.status[i] == 0) {
+                        $("#users").append('<span style="cursor: pointer"  class="ban" id=' + res.users[i].userId + '>' + '封禁' + '</span>' + "<br>")
+                    } else {
+                        $("#users").append('<span style="cursor: pointer"  class="unseal" id=' + res.users[i].userId + '>' + '解封' + '</span>' + "<br>")
+                    }
+                }
+                //解封
+                $(".unseal").click(function () {
+                    unsealUser($(this).attr("id"))
+                })
+                //封禁
+                $(".ban").click(function () {
+                    banUser($(this).attr("id"), $("#type").find("option:selected").val())
+                })
+            },
+            dataType: "json"
+        })
+    })
+
+    function banUser(userId, banTime) {
+        $.ajax({
+            url: "admin/adminBanUser",
+            type: "POST",
+            data: {userId: userId, banTime: banTime},
+            complete: function (res) {
+                location.reload();
+                alert("封禁成功")
+            }
+        })
+    }
+
+    function unsealUser(userId) {
+        $.ajax({
+            url: "admin/unblockUser",
+            type: "POST",
+            data: {userId: userId},
+            complete: function (res) {
+                location.reload();
+                alert("解封成功")
+            }
+        })
+    }
+
+    //获取封禁用户
+    $("#ban").click(function ban() {
+        $("#users").html("")
+        $("#type").hide()
+        $.ajax({
+            url: "admin/getBanUsers",
+            type: "POST",
+            data: {},
+            success: function (res) {
+                for (var i = 0; i < res.length; i++) {
+                    $("#users").append('<span style="display: inline-block;width: 100px" id="user">' + res[i].nickName + '</span>');
+                    $("#users").append('<span style="cursor: pointer"  class="unseal" id=' + res[i].userId + '>' + '解封' + '</span>' + "<br>")
+                }
+                //解封
+                $(".unseal").click(function () {
+                    unsealUser($(this).attr("id"))
+                })
+            },
+            dataType: "json"
+        })
+    })
+
+    //获取正常用户
+    $("#normal").click(function nomral() {
+        $("#users").html("")
+        $("#type").show()
+        $.ajax({
+            url: "admin/getNormalUsers",
+            type: "POST",
+            data: {},
+            success: function (res) {
+                $("#users").append('<br>')
+                for (var i = 0; i < res.length; i++) {
+                    $("#users").append('<span style="display: inline-block;width: 100px">' + res[i].nickName + '</span>');
+                    $("#users").append('<span style="cursor: pointer" class="ban" id=' + res[i].userId + '>' + '封禁' + '</span>' + "<br><br>")
+                }
+                //封禁
+                $(".ban").click(function () {
+                    banUser($(this).attr("id"), $("#type").find("option:selected").val())
+                })
+            },
+            dataType: "json"
+        })
+    })
+</script>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-3.6.0.js"></script>
+</head>
+<body>
+<div id="userid" hidden="hidden"></div>
+<img id="headimg" src="" width="100px" height="100px"><br>
+用户名<span id="username"></span>
+昵称<span id="nickname"></span>
+<span id="blog">文章</span>
+<span id="concerns">关注</span>
+<span id="fans">粉丝</span>
+<span id="collect">收藏夹</span>
+<div id="show" align="center">
+</div>
+</body>
+<script>
+    var userId = location.href.substring(location.href.lastIndexOf('=') + 1)
+
+
+    //其他用户的信息
+    $.ajax({
+        url: "user/getOthersMessage",
+        type: "POST",
+        data: {userId: userId},
+        success: function (res) {
+            $("#userid").html(res.user.userId)
+            $("#username").html(res.user.userName)
+            $("#headimg").attr("src", res.user.headImg)
+            $("#nickname").html(res.user.nickName)
+
+        },
+        dataType: "json"
+    })
+
+
+    //其他用户的关注
+    $("#concerns").click(function () {
+        $.ajax({
+            url: "user/getConcerns",
+            type: "POST",
+            data: {userId: userId},
+            success: function (res) {
+                var concen = "<tr>" + "<td>昵称</td>" + "</tr>"
+                for (var i = 0; i < res.length; i++) {
+                    concen += "<tr><td>" + '<a target=_blank href=otherSpace.html?userId=' + res[i].userId + '>' + res[i].userName + '</a></td>' + '</tr>'
+                }
+                $("#show").html(concen)
+            },
+            dataType: "json"
+        });
+    })
+
+
+    //其他用户的粉丝
+    $("#fans").click(function () {
+        $.ajax({
+            url: "user/getFans",
+            type: "POST",
+            data: {userId: userId},
+            success: function (res) {
+                var fan = "<tr>" + "<td>昵称</td>" + "</tr>"
+                for (var i = 0; i < res.length; i++) {
+                    fan += "<tr><td>" + '<a target=_blank href=otherSpace.html?userId=' + res[i].userId + '>' + res[i].userName + '</a></td>' + '</tr>'
+                }
+                $("#show").html(fan)
+            },
+            dataType: "json"
+        });
+    })
+
+
+    //其他用户的文章
+    $("#blog").click(function () {
+        $.ajax({
+            url: "blog/userBlog",
+            type: "POST",
+            data: {userId: userId},
+            success: function (res) {
+                var blog = ""
+                for (var i = 0; i < res.length; i++) {
+                    blog += '<a target=_blank href=blog.html?blogId=' + res[i].blogId + '>' + res[i].title + '</a>' + "<br>"
+                }
+                $("#show").html(blog)
+            },
+            dataType: "json"
+        });
+    })
+
+
+    //其他用户的收藏
+    $("#collect").click(function () {
+        $.ajax({
+            url: "collect/getOthersCollects",
+            type: "POST",
+            data: {userId: userId},
+            success: function (res) {
+                var blog = ""
+                for (var i = 0; i < res.length; i++) {
+                    blog += '<a target=_blank href=blog.html?blogId=' + res[i].blogId + '>' + res[i].title + '</a>' + "<br>"
+                }
+                $("#show").html(blog)
+            },
+            dataType: "json"
+        });
+    })
+</script>
+</html>

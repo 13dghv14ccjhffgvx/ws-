@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-3.6.0.js"></script>
+</head>
+<body>
+  <a href="index.html">博客</a>
+  <a href="personSpace.html">用户</a>
+  <a href="addblog.html">创作</a>
+  <div>
+      <span id="blog">博客</span>
+      <span id="user">用户</span>
+  </div>
+        <table id="table">
+       </table>
+</body>
+<script>
+    var info=location.href.substring(location.href.lastIndexOf("=")+1);
+
+    //获取文章
+    $.ajax({
+        url: "search/searchBlog",
+        type: "POST",
+        data: {title:info},
+        success: function (res) {
+            var list = "";
+            for (var i = 0; i < res.length; i++) {
+                list += '<a target=_blank href=blog.html?blogId=' + res[i].blogId + '>' + res[i].title + '</a>' + "<br>";
+            }
+            $("#table").html(list);
+        },
+        dataType: "json"
+    })
+
+    //查看文章
+    $("#blog").click(function (){
+        $.ajax({
+            url: "search/searchBlog",
+            type: "POST",
+            data: {title:info},
+            success: function (res) {
+                var list = "";
+                for (var i = 0; i < res.length; i++) {
+                    list += '<a target=_blank href=blog.html?blogId=' + res[i].blogId + '>' + res[i].title + '</a>' + "<br>";
+                }
+                $("#table").html(list);
+            },
+            dataType: "json"
+        })
+    })
+
+    //查看用户
+    $("#user").click(function (){
+        $.ajax({
+            url: "search/serachUser",
+            type: "POST",
+            data: {userNickName:info},
+            success: function (res) {
+                var list = "";
+                for (var i = 0; i < res.length; i++) {
+                    list += '<a target=_blank href=otherSpace.html?userId=' + res[i].userId + '>' + res[i].nickName + '</a>' + "<br>";
+                }
+                $("#table").html(list);
+            },
+            dataType: "json"
+        })
+    })
+</script>
+</html>

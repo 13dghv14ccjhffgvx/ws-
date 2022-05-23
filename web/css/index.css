@@ -1,0 +1,207 @@
+
+#next:hover,
+#pre:hover,
+#first:hover,
+#last:hover {
+    color: brown;
+    cursor: pointer;
+}
+
+header {
+    display: flex;
+    width: auto;
+    height: 49px;
+}
+
+/* 头部中左侧头部的制作 */
+.header-left {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 550px;
+    height: 100%;
+}
+
+.header-left a:first-child {
+    width: 85px;
+    height: 49px;
+}
+
+.header-left ul {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 400px;
+    height: 100%;
+}
+
+.header-left li {
+    padding: 0 7px;
+    height: 100%;
+    line-height: 49px;
+    list-style: none;
+}
+
+.header-left li a {
+    color: #222226;
+    font-size: 14px;
+    text-decoration: none;
+}
+
+/* 头部中中间输入框和按钮框的制作 */
+.header-middle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 37.5%;
+    height: 100%;
+    margin: 0 auto;
+}
+
+.header-middle input {
+    width: 616px;
+    height: 26px;
+    border: 1px solid #e8e8ed;
+    border-right: none;
+    border-radius: 15px 0 0 15px;
+    background-color: #f5f6f7;
+    text-indent: 1em;
+    outline: none;
+}
+
+/*********************************************/
+.header-middle button span {
+    font-family: 'icomoon';
+    font-size: 13px;
+    color: #ffffff;
+}
+
+.header-middle button {
+    width: 90px;
+    height: 30px;
+    border: 1px solid #e8e8ed;
+    border-radius: 0 15px 15px 0;
+    background-color: #fc5531;
+}
+
+.header-middle button a {
+    display: inline-block;
+    color: #ffffff;
+    text-decoration: none;
+}
+
+/* 头部中右侧框的制作 */
+.header-right {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    column-gap: 10px;
+    width: 460px;
+    height: 100%;
+}
+
+.header-right li {
+    display: flex;
+    align-items: center;
+    width: 90px;
+    list-style: none;
+    height: 100%;
+}
+
+.header-right .footprint,
+.header-right .dynamic {
+    width: 35px;
+}
+
+.header-right li a {
+    color: #222226;
+    font-size: 14px;
+    text-decoration: none;
+}
+
+.header-right .gift {
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+.header-right .gift img {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    margin-top: -11.59px;
+    margin-right: 9px;
+    width: 14px;
+    height: 23.58px;
+}
+
+.header-right li span {
+    display: inline-block;
+    width: 90px;
+    height: 30px;
+    line-height: 30px;
+    border-radius: 15px;
+    background-color: #7f4ffe;
+    color: #ffffff;
+    text-align: center;
+}
+
+* {
+    padding: 0;
+    margin: 0;
+}
+
+/* //////////////////////////////////////////////////////////////////中间内容部分的制作 */
+article {
+    position: relative;
+    width: 100%;
+    height: 550px;
+    background-color: #fafafa;
+    margin-top: 5px;
+}
+
+section {
+    position: relative;
+    width: 1380px;
+    height: 100%;
+    margin: auto;
+    background-color: #fafafa;
+}
+
+.section-top {
+    width: 100%;
+    height: 10px;
+    background-color: #fafafa;
+}
+
+section .nav {
+    position: relative;
+    width: 100%;
+    height: 70px;
+    background-color: #ffffff;
+}
+
+section .nav ul {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    height: 70px;
+}
+
+section .nav li {
+    list-style: none;
+}
+
+section .nav li a {
+    color: #555666;
+    font-size: 15px;
+    text-decoration: none;
+}
+
+.section-middle {
+    width: 100%;
+    height: 40px;
+    background-color: #fafafa;
+}

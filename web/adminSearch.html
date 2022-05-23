@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-3.6.0.js"></script>
+</head>
+<body>
+<span id="blog">文章</span>
+<span id="delete">批量删除</span>
+<table id="show"></table>
+</body>
+<script>
+    var title = location.href.substring(location.href.lastIndexOf("=") + 1);
+
+    //搜索文章
+    function search() {
+        $.ajax({
+            url: "search/searchBlog",
+            type: "POST",
+            data: {title: title},
+            success: function (res) {
+                $("#show").html("")
+                for (var i = 0; i < res.length; i++) {
+                    $("#show").append('<input type="checkbox" name="subcheck" value='+res[i].blogId+'>'+'<a target=_blank href=blog.html?blogId=' + res[i].blogId + '>' + res[i].title + '</a>');
+                    $("#show").append('<span class="deleteblog" id=' + res[i].blogId + '>' + '删除' + '</span>' + "<br>");
+                }
+                //删除文章
+                $(".deleteblog").click(function () {
+                    $.ajax({
+                        url: "admin/adminDeleteBlog",
+                        type: "POST",
+                        data: {blogId: $(this).attr("id")},
+                        complete: function (res) {
+                            alert("删除成功")
+                            search()
+                        }
+                    })
+                })
+            },
+            dataType: "json"
+        })
+    }
+    search()
+    //批量删除文章
+    $("#delete").click(function (){
+        var checkedList = new Array();
+        var checkedNum = $("input[name='subcheck']:checked").length
+        if (checkedNum==0){
+            alert("请先选择删除的文章")
+            return ;
+        }
+        $("input[name='subcheck']:checked").each(function (){
+            checkedList.push($(this).val())
+        })
+        $.ajax({
+            url: "admin/deleteBlogs",
+            type: "POST",
+            data: {blogIds: checkedList.toString()},
+            success: function (res) {
+                alert("删除成功")
+                search()
+            }
+        })
+    })
+
+</script>
+</html>

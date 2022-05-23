@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-3.6.0.js"></script>
+</head>
+<body>
+
+</body>
+<script>
+    //退出登录
+    $.ajax({
+        url: "user/logout",
+        type: "POST",
+        data: {},
+        success: function (res) {
+        },
+        dataType: "json",
+    });
+    location.href="index.html"
+    alert("退出成功")
+</script>
+</html>

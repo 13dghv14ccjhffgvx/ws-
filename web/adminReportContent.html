@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-3.6.0.js"></script>
+</head>
+<body>
+<div id="blog" style="position:absolute;left: 45%;top: 1%" >举报文章:&nbsp;</div>
+
+<div id="type" style="position:absolute;left: 45%;top: 5%">举报类型:&nbsp;</div>
+
+<div id="content" style="position:absolute;left: 45%;top: 10%">举报内容:&nbsp;</div>
+<img src="" id="img" style="display: block;position:absolute;left: 45%;top: 15%" width="100px" height="100px" >
+<span id="check" style="position:fixed;right: 20%;bottom: 50%">确定审核</span>
+</body>
+<script>
+    //获取举报内容
+    $.ajax({
+        url: "report/getReport",
+        type: "POST",
+        data: {reportId: location.href.substring(location.href.lastIndexOf('=') + 1)},
+        success: function (res) {
+            if (res.report.status==1){
+                $("#check").hide()
+            }
+            $("#blog").append(res.blog.title)
+            $("#content").append(res.report.reportContent);
+            $("#img").attr("src", res.report.imgPath)
+            $("#type").append(res.report.reportType)
+        },
+        dataType: "json",
+    });
+    //审核文章，文章状态变为已审核
+    $("#check").click(function () {
+        $.ajax({
+            url: "admin/adminCheckReport",
+            type: "POST",
+            data: {reportId: location.href.substring(location.href.lastIndexOf('=') + 1)},
+            success: function (res) {
+                if (res==1){
+                    alert("审核成功")
+                }
+            },
+            dataType: "json",
+        });
+    })
+</script>
+</html>

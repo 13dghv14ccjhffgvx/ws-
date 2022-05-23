@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-3.6.0.js"></script>
+</head>
+<body>
+<div style="position: absolute;top: 25%;left: 45%">
+用户名：<input type="text" id="userName" onblur="regName()"/><span id="regName"></span><br/>
+昵称:<input type="text" id="nickName" onblur="regNickName()"><span id="regNickName"></span><br>
+密码：<input type="password" id="pwd" onblur="regPwd()"/><span id="regPwd"></span><br/>
+确认密码：<input type="password" id="surePwd" onblur="regSurePwd()"/><span id="regSurePwd"></span><br/>
+<input type="button" value="注册" id="reg">
+</div>
+
+</body>
+<script type="text/javascript">
+    //判断用户名格式
+    function regName() {
+        var result
+        $.ajax({
+            url: "user/judgUserName",
+            type: "POST",
+            data: {userName: $("#userName").val()},
+            async:false,
+            success: function (res) {
+                if (res == 1) {
+                    $("#regName").html("用户名已存在")
+                    $("#regName").css("color", "red")
+                }
+                result = res
+            },
+            dataType: "json",
+        });
+        if (result==1){
+            return false
+        }
+        var userPattern = /^[a-zA-Z0-9_-]{4,16}$///用户名
+
+        if (userPattern.test($("#userName").val())) {
+            //用户名
+            $("#regName").html("正确")
+            $("#regName").css("color", "green")
+            return true
+        } else {
+            $("#regName").html("请输入4到16位（字母，数字，下划线，减号）的组合")
+            $("#regName").css("color", "red")
+            return false
+        }
+    }
+
+    //验证昵称
+    function regNickName() {
+        var result;
+        if ($("#nickName").val() == "") {
+            $("#regNickName").html("昵称不能为空")
+            $("#regNickName").css("color", "red")
+            return false
+        }
+        $.ajax({
+            url: "user/judgNickName",
+            type: "POST",
+            data: {nickName: $("#nickName").val()},
+            async:false,
+            success: function (res) {
+                result= res
+                if (res == 1) {
+                    $("#regNickName").html("昵称已存在")
+                    $("#regNickName").css("color", "red")
+                } else {
+                    $("#regNickName").html("正确")
+                    $("#regNickName").css("color", "green")
+                }
+
+            },
+            dataType: "json",
+        });
+        if (result==1){
+            return false
+        }else {
+            return true
+        }
+    }
+
+    //验证密码格式
+    function regPwd() {
+        var pwdPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[~!@&%#_])[a-zA-Z0-9~!@&%#_]{8,16}$/ //密码
+        if (pwdPattern.test($("#pwd").val())) {
+            //密码
+            $("#regPwd").html("正确")
+            $("#regPwd").css("color", "green")
+            return true
+        } else {
+            $("#regPwd").html("请输入必须包含一个大写，一个小写字母，一个数字，一个特殊字符，且长度为8到16位的密码")
+            $("#regPwd").css("color", "red")
+            return false
+        }
+    }
+
+    //确认密码
+    function regSurePwd() {
+        if ($("#pwd").val() == $("#surePwd").val() && $("#surePwd").val() != "") {
+            //确认密码
+            $("#regSurePwd").html("正确")
+            $("#regSurePwd").css("color", "green")
+            return true
+        } else {
+            $("#regSurePwd").html("两次密码不一致")
+            $("#regSurePwd").css("color", "red")
+            return false
+        }
+    }
+
+    //注册
+    $("#reg").click(function () {
+        if (!regName()) {
+            return
+        } else if (!regNickName()) {
+            return
+        } else if (!regPwd()) {
+            return
+        } else if (!regSurePwd()) {
+            return
+        }
+        $.ajax({
+            url: "user/register",
+            type: "POST",
+            data: {userName: $("#userName").val(), nickName: $("#nickName").val(), pwd: $("#pwd").val()},
+            complete: function () {
+                location.href = "login.html"
+                alert("注册成功")
+            },
+            dataType: "json",
+        });
+    })
+</script>
+</html>

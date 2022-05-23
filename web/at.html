@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-3.6.0.js"></script>
+</head>
+<body>
+<ul>
+    <li id="atOther">@别人</li>
+    <li><a href="privateMessage.html">私信</a></li>
+</ul>
+<div align="center">
+    <table id="message"></table>
+    <div id="atOtherView" hidden="hidden"><span>@的用户昵称</span><input type="text" id="receiverName"><br><br>
+        <textarea name="description" style="resize:none;" cols="40" rows="5" placeholder="请输入内容" id="content"></textarea>
+        <input type="button" value="发送" id="send" style="vertical-align: middle">
+    </div>
+</div>
+
+</body>
+<script>
+    /**
+     * 规范时间格式
+     * @param data
+     * @returns {string}
+     */
+    function time(data) {
+        var date = new Date(data)
+        var Y = date.getFullYear() + '-'
+        var M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-'
+        var D = (date.getDate() < 10 ? '0' + date.getDate() : date.getDate()) + ' '
+        var h = (date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':'
+        var m = (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()) + ':'
+        var s = (date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds())
+        return Y + M + D + h + m + s
+    }
+
+    at()
+    //当发送点击时显示发送的框
+    $("#atOther").click(function () {
+        $("#atOtherView").show()
+    })
+    //发送信息
+    $("#send").click(function () {
+        if ($("#content").val()==""){
+            alert("内容不能为空")
+            return
+        }
+        $.ajax({
+            url: "at/at",
+            type: "POST",
+            data: {receiverName: $("#receiverName").val(), message: $("#content").val()},
+            success: function (res) {
+                if (res == 0) {
+                    alert("不存在此用户")
+                } else {
+                    alert("发送成功")
+                }
+
+            },
+            dataType: "json"
+        })
+    })
+
+
+
+    //获取at消息
+    function at() {
+        $.ajax({
+            url: "at/getAt",
+            type: "POST",
+            data: {},
+            success: function (res) {
+                for (var i = 0; i < res.ats.length; i++) {
+                    $("#message").append('<div>'+time(res.ats[i].atTime)+'</div>'+'<div>' + res.senders[i].userName + '对你说:' + res.ats[i].message + '</div>'+'<br>')
+                }
+            },
+            dataType: "json"
+        })
+    }
+
+    //获取未读消息
+    function unreadAt() {
+        $.ajax({
+            url: "at/getUnreadAt",
+            type: "POST",
+            data: {},
+            success: function (res) {
+                if (res != "") {
+                    $.ajax({
+                        url: "at/readAt",
+                        type: "POST",
+                        data: {},
+                        complete: function () {
+                            $("#message").html("")
+                            at()
+                        },
+                        dataType: "json"
+                    });
+                }
+            },
+            dataType: "json"
+        });
+    }
+
+    //ajax轮询,每两秒发送一次请求
+    window.setInterval("unreadAt()", 2000)
+
+
+</script>
+</html>

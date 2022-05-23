@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-3.6.0.js"></script>
+</head>
+<body>
+<div align="center">
+    <br><br>
+    用户名<span id="username"></span>
+    <br><br>
+    用户昵称:<span id="nickname" ></span>
+    <br><br>
+    <img  id="head" src="" height="100" width="100">
+    <br><br>
+    用户id:<span id="id"></span>
+    <br><br>
+    性别:<span id="sex"></span>
+    <br><br>
+    个人简介：<span id="introduction"></span>
+    <br><br>
+创建时间：<span id="createTime"></span>
+    <br><br>
+<input type="button" value="修改" id="modify">
+</div>
+
+</body>
+<script>
+    //修改
+    $("#modify").click(function () {
+        location.href = "modify.html";
+    })
+
+
+    //个人信息
+    $.ajax({
+        url: "user/getUserMessage",
+        type: "POST",
+        data: {},
+        success: function (res) {
+            $("#nickname").html(res.user.nickName)
+            $("#username").html(res.user.userName)
+            $("#head").attr("src",res.user.headImg)
+            $("#sex").html(res.user.userSex)
+            $("#id").html(res.user.userId)
+            $("#introduction").html(res.user.userIntroduction)
+            $("#createTime").html(res.time)
+        },
+        dataType: "json"
+    });
+</script>
+</html>

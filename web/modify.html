@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-3.6.0.js"></script>
+</head>
+<body>
+<br>
+<br>
+<br>
+<div align="center">
+    用户昵称
+    <span><input type="text" id="name" onblur="regNickName()"></span><span id="regNickName"></span>
+    <br><br>
+    用户id
+    <span userid="id"></span>
+    <br><br>
+    <span>用户头像</span>
+    <img id="img" src="" height="100" width="100" style="vertical-align: middle">
+    <br><br>
+    <input type="file" id="headImg">
+    <br><br>
+    性别:
+    <span>
+        <input type="radio" name="sex" id="man" checked="checked" value="男">男
+        <input type="radio" name="sex" id="women" value="女">女
+    </span>
+    <br><br>
+    个人简介
+    <span><input type="text" id="introduction"></span>
+    <br><br>
+    创建时间
+    <span id="createTime"></span>
+    <br><br>
+    <input type="button" value="确定" id="yes">
+    <input type="button" value="取消" id="no">
+</div>
+
+</body>
+<script>
+    //验证昵称
+    function regNickName() {
+        var result
+        $.ajax({
+            url: "user/judgNickName",
+            type: "POST",
+            data: {nickName: $("#name").val()},
+            async: false,
+            success: function (res) {
+                if (res == 1) {
+                    $("#regNickName").html("昵称已存在")
+                    $("#regNickName").css("color", "red")
+                } else {
+                    $("#regNickName").html("正确")
+                    $("#regNickName").css("color", "green")
+                }
+                result = res
+            },
+            dataType: "json",
+        });
+        if (result == 1) {
+            return false
+        } else {
+            return true
+        }
+    }
+
+    //修改
+    $("#yes").click(function () {
+        if (userNickName != $("#name").val()) {
+            if (!regNickName()) {
+                return
+            }
+        }
+        $("#img").attr("src",)
+        var formData = new FormData;
+        var file = $("#headImg")[0].files[0];
+        formData.append("userId", $("#userid").html())
+        formData.append("name", encodeURI($("#name").val()))
+        formData.append("sex", encodeURI($("input[type='radio']:checked").val()))
+        formData.append("introduction", encodeURI($("#introduction").val()))
+        formData.append("headImg", file)
+        $.ajax({
+            url: "user/modifyMessage",
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (res) {
+                $("#name").val(res.userName)
+                if (res.userSex == "男") {
+                    $("#man").attr("checked", true);
+                } else if (res.userSex == "女") {
+                    $("#women").attr("checked", true);
+                }
+                $("#introduction").val(res.userIntroduction)
+                location.href = "userinfo.html"
+            },
+            dataType: "json"
+        });
+    })
+
+    //不修改
+    $("#no").click(function () {
+        location.href = "userinfo.html"
+    })
+
+    var userNickName;
+    //获取用户信息
+    $.ajax({
+        url: "user/getUserMessage",
+        type: "POST",
+        data: {},
+        success: function (res) {
+            userNickName = res.user.nickName
+            $("#img").attr("src", res.user.headImg)
+            $("#name").val(res.user.nickName)
+            if (res.user.userSex == "男") {
+                $("#man").attr("checked", true);
+            } else if (res.user.userSex == "女") {
+                $("#women").attr("checked", true);
+            }
+            $("#userd").html(res.user.userId)
+            $("#introduction").val(res.user.userIntroduction)
+            $("#createTime").html((res.time))
+        },
+        dataType: "json"
+    });
+
+
+</script>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-3.6.0.js"></script>
+</head>
+<body>
+<a href="index.html">CSDN</a>
+<a href="personSpace.html">个人中心</a>
+<tr>
+    <ul>
+        <li id="blogmanage">
+            <a href="contentManage.html"> 文章管理</a>
+        </li>
+        <li id="commentmanage">
+            <a id="comment" href="commentManage.html">评论管理</a>
+        </li>
+        <li>
+            <a href="collectManage.html">收藏管理</a>
+        </li>
+    </ul>
+
+</tr>
+<div align="center">
+    <table id="show"></table>
+</div>
+<span id="delete">批量删除</span>
+</body>
+<script>
+    //个人的文章
+    function blog() {
+        $.ajax({
+            url: "user/getMyBlog",
+            type: "POST",
+            data: {},
+            success: function (res) {
+                $("#show").html("")
+                for (var i = 0; i < res.length; i++) {
+                    $("#show").append('<input type="checkbox" name="subcheck" value=' + res[i].blogId + '>' + '<a target=_blank href=blog.html?blogId=' + res[i].blogId + '>' + res[i].title + '</a>');
+                    $("#show").append('<a href=modifyBlog.html?blogId=' + res[i].blogId + ' style="position: absolute;right: 270px">' + '修改' + '</a>')
+                    $("#show").append('<span  class="deleteblog" id=' + res[i].blogId + ' style="position: absolute;right: 200px">' + '删除' + '</span>' + "<br>");
+                }
+                //删除文章
+                $(".deleteblog").click(function () {
+                    $.ajax({
+                        url: "user/deleteMyBlog",
+                        type: "POST",
+                        data: {blogId: $(this).attr("id")},
+                        success: function (res) {
+                            alert("删除成功")
+                            blog()
+                        }
+                    })
+                })
+            }
+        })
+    }
+
+    blog()
+    //批量删除文章
+    $("#delete").click(function () {
+        var checkedList = new Array();
+        var checkedNum = $("input[name='subcheck']:checked").length
+        if (checkedNum == 0) {
+            alert("请先选择删除的文章")
+            return;
+        }
+        $("input[name='subcheck']:checked").each(function () {
+            checkedList.push($(this).val())
+        })
+        $.ajax({
+            url: "user/deleteMyBlogs",
+            type: "POST",
+            data: {blogIds: checkedList.toString()},
+            success: function (res) {
+                alert("删除成功")
+                blog()
+            }
+        })
+    })
+
+
+</script>
+</html>

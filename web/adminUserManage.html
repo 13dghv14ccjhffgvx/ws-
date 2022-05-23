@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-3.6.0.js"></script>
+    <link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+<a href="index.html">CSDN</a>
+<a href="adminBlogManage.html">文章管理</a>
+<a href="adminUserManage.html">评论管理</a>
+<a href="adminReport.html">举报管理</a>
+<a href="adminBan.html">用户封禁管理</a>
+<div class="header-middle">
+    <input type="text" placeholder="" id="searchinfo">
+    <button id="search">搜索</button>
+</div>
+<div align="center" style="margin-top: 100px">
+    <span style="margin-bottom: 20px;display: block">用户</span>
+    <table id="show"></table>
+</div>
+
+
+</body>
+<script>
+    //除管理员以外的所有用户
+    $.ajax({
+        url: "user/getAllUser",
+        type: "POST",
+        data: {},
+        success: function (res) {
+            for (var i = 0; i < res.length; i++) {
+                $("#show").append('<a target=_blank href=admintouser.html?userId=' + res[i].userId + '>' + res[i].nickName + '</a>' + "<br><br>")
+            }
+        },
+        dataType: "json"
+    })
+
+    //搜索用户
+    $("#search").click(function () {
+        $.ajax({
+            url: "search/serachUser",
+            type: "POST",
+            data: {userNickName: $("#searchinfo").val()},
+            success: function (res) {
+                $("#show").html("")
+                for (var i = 0; i < res.length; i++) {
+                    $("#show").append('<a target=_blank href=admintouser.html?userId=' + res[i].userId + '>' + res[i].nickName + '</a>' + "<br><br>")
+                }
+            },
+            dataType: "json"
+        })
+    })
+</script>
+</html>

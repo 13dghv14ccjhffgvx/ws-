@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-3.6.0.js"></script>
+</head>
+<body>
+<a href="index.html">CSDN</a>
+<a href="personSpace.html">个人中心</a>
+<tr>
+    <ul>
+        <li id="blogmanage">
+            <a href="contentManage.html"> 文章管理</a>
+        </li>
+        <li id="commentmanage">
+            <a id="comment" href="commentManage.html">评论管理</a>
+        </li>
+        <li>
+            <a href="collectManage.html">收藏管理</a>
+        </li>
+    </ul>
+</tr>
+<input type="button" value="批量删除" id="deleteComments">
+<div align="center">
+    <table id="show"></table>
+</div>
+
+</body>
+<script>
+
+    //个人的评论
+    function comment() {
+        $.ajax({
+            url: "comment/getMyComments",
+            type: "POST",
+            data: {},
+            success: function (res) {
+                $("#show").html("")
+                for (var i = 0; i < res.myComments.length; i++) {
+                    $("#show").append('<input style="position:absolute;left: 500px" type="checkbox" name="subcheck" value=' + res.myComments[i].commentId + '>' + '<a style="position:absolute;left: 550px" target=_blank href=blog.html?blogId=' + res.blogs[i].blogId + '>' + res.blogs[i].title + '</a>' + '<span style="position:absolute; left: 750px">' + res.myComments[i].content + '</span>');
+                    $("#show").append('<span style="position:absolute; right: 700px" class="deletecomment" id=' + res.myComments[i].commentId + '>' + '删除' + '</span>' + "<br>");
+                }
+                //删除评论
+                $(".deletecomment").click(function () {
+                    $.ajax({
+                        url: "comment/deleteMyComment",
+                        type: "POST",
+                        data: {commentId: $(this).attr("id")},
+                        complete: function (res) {
+                            alert("删除成功")
+                            comment()
+                        }
+                    })
+                })
+            }
+        })
+    }
+
+    //批量删除评论
+    $("#deleteComments").click(function () {
+        var checkedList = new Array();
+        var checkedNum = $("input[name='subcheck']:checked").length
+        if (checkedNum == 0) {
+            alert("请先选择删除的文章")
+            return;
+        }
+        $("input[name='subcheck']:checked").each(function () {
+            checkedList.push($(this).val())
+        })
+        $.ajax({
+            url: "comment/deleteMyComments",
+            type: "POST",
+            data: {commentIds: checkedList.toString()},
+            success: function (res) {
+                alert("删除成功")
+                comment()
+            }
+        })
+    })
+    comment()
+</script>
+</html>

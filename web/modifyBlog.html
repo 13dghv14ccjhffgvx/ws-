@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-3.6.0.js"></script>
+</head>
+<body>
+<div>
+    <input type="text" placeholder="请输入标题" id="title">
+</div>
+
+<div>
+    <textarea name="description" style="resize:none" cols="80" rows="50" placeholder="请输入内容" id="content"></textarea>
+</div>
+<div>
+    <input type="file"  id="img" value="图片">
+</div>
+<select id="type">
+    <option value="人工智能">
+        人工智能
+    </option>
+    <option value="前端">
+        前端
+    </option>
+    <option value="后端">
+        后端
+    </option>
+    <option value="架构">
+        架构
+    </option>
+    <option value="区块链">
+        区块链
+    </option>
+    <option value="数据库">
+        数据库
+    </option>
+    <option value="5G">
+        5G
+    </option>
+    <option value="游戏开发">
+        游戏开发
+    </option>
+    <option value="大数据">
+        大数据
+    </option>
+</select>
+<input type="button" value="发布" id="btn">
+</body>
+<script>
+    var userId;
+    //获取文章
+    $.ajax({
+        url: "blog/getBlog",
+        type: "POST",
+        data: {BlogId:location.href.substring(location.href.lastIndexOf('=') + 1) },
+        success: function (res) {
+            $("#title").attr("value",res.Blog.title)
+            $("#content").html(res.Blog.content);
+            $("#type").val(res.Blog.type)
+           userId=res.author.userId
+        },
+        dataType: "json"
+    })
+    //修改文章
+    $("#btn").click(function () {
+        $.ajax({
+            url: "admin/getBanUser",
+            type: "POST",
+            data: {userId: userId},
+            success: function (res) {
+                if (res == 1) {
+                    alert("你已被封禁,无法进行相关操作")
+                    return
+                }else {
+                    var file = $("#img")[0].files[0];
+                    var formData = new FormData();
+                    formData.append("img", file)
+                    formData.append("content", encodeURI($("#content").val()))
+                    formData.append("type", encodeURI($("#type").find("option:selected").val()))
+                    formData.append("title", encodeURI($("#title").val()))
+                    formData.append("blogId", location.href.substring(location.href.lastIndexOf('=') + 1))
+                    $.ajax({
+                        url: "user/modifyBlog",
+                        type: "POST",
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        complete: function () {
+                            location.href = "contentManage.html";
+                        },
+                    })
+                }
+            }})
+    })
+
+</script>
+</html>
